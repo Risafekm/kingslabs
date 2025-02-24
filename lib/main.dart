@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:kingslabs/provider/userprovider_signin.dart';
+import 'package:kingslabs/screens/dashboard/homescreen.dart';
+import 'package:provider/provider.dart';
+import 'provider/productprovider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => UserproviderSignin()),
+        ChangeNotifierProvider(create: (context) => ProductProvider())
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -10,7 +22,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: LoginScreen(),
+      debugShowCheckedModeBanner: false,
+      home: HomeScreen(),
+      // home: LoginScreen(),
     );
   }
 }
