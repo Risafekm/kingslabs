@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kingslabs/screens/dashboard/homescreen.dart';
 import 'package:kingslabs/screens/splash_screen/splash_screen.dart';
 import 'package:provider/provider.dart';
 import 'provider/productprovider.dart';

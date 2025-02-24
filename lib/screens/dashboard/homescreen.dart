@@ -1,12 +1,17 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kingslabs/screens/dashboard/widgets/edit_button.dart.dart';
 import 'package:kingslabs/screens/dashboard/widgets/product_tile.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/product_model.dart';
 import '../../provider/productprovider.dart';
 import '../../core/colors.dart';
 import '../../core/style.dart';
+import '../description_page/product_detail_screen.dart';
+import '../login/login_screen.dart'; // Import your login screen
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,6 +29,16 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // Logout
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,6 +47,15 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: AppColors.accentColor1,
         title: Text('Home Screen', style: AppStyles.appBarTitle),
         elevation: 3,
+        actions: [
+          IconButton(
+            onPressed: _logout,
+            icon: Icon(
+              Icons.logout,
+              color: AppColors.secondaryColor,
+            ),
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -43,7 +67,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (provider.isLoading) {
                     return const Center(
                       child: CircularProgressIndicator(
-                          color: AppColors.loadingcolor),
+                        color: AppColors.loadingcolor,
+                      ),
                     );
                   }
                   if (provider.productModel == null ||
@@ -59,15 +84,30 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemBuilder: (context, index) {
                       final product = products[index];
                       return ListTile(
-                        leading: Image.network(product.images[0],
-                            width: 80, height: 100, fit: BoxFit.cover),
-                        title: Text(product.title,
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  ProductDetailScreen(product: product),
+                            ),
+                          );
+                        },
+                        leading: Image.network(
+                          product.images[0],
+                          width: 80,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                        title: Text(
+                          product.title,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         subtitle: Text("Price: \$${product.price}"),
                         trailing: CircleAvatar(
                           backgroundColor: Colors.grey.shade200,
                           child: IconButton(
-                            icon: Icon(Icons.edit, color: Colors.blue),
+                            icon: const Icon(Icons.edit, color: Colors.blue),
                             onPressed: () {
                               Navigator.push(
                                 context,
@@ -85,8 +125,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             ),
-            SizedBox(height: 20),
-            //flas offer
+            const SizedBox(height: 20),
+            // Flash offer section
             Container(
               height: 420,
               decoration: const BoxDecoration(
@@ -104,10 +144,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (provider.isLoading) {
                     return const Center(
                       child: CircularProgressIndicator(
-                          color: AppColors.loadingcolor),
+                        color: AppColors.loadingcolor,
+                      ),
                     );
                   }
-
                   if (provider.productModel == null ||
                       provider.productModel!.products.isEmpty) {
                     return const Center(child: Text("No data found."));
@@ -120,7 +160,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(
-                            left: 15, right: 10, top: 10, bottom: 20),
+                          left: 15,
+                          right: 10,
+                          top: 10,
+                          bottom: 20,
+                        ),
                         child: Row(
                           children: [
                             const CircleAvatar(
@@ -156,7 +200,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           scrollDirection: Axis.horizontal,
                           itemBuilder: (context, index) {
                             final product = products[index];
-
                             return ProductTile(product: product);
                           },
                         ),
