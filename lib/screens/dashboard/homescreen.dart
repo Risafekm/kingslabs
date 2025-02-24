@@ -1,16 +1,16 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter/material.dart';
-import 'package:kingslabs/core/colors.dart';
-import 'package:kingslabs/core/style.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:kingslabs/screens/dashboard/widgets/edit_button.dart.dart';
+import 'package:kingslabs/screens/dashboard/widgets/product_tile.dart';
 import 'package:provider/provider.dart';
 import '../../models/product_model.dart';
 import '../../provider/productprovider.dart';
-
-// Dummy colors and styles. Replace with your own definitions as needed.
+import '../../core/colors.dart';
+import '../../core/style.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -19,13 +19,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch data after the first frame.
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<ProductProvider>(context, listen: false).getData();
     });
   }
-
-  final formkey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -33,103 +30,142 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: AppColors.accentColor1,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon:
-              const Icon(Icons.arrow_back_ios, color: AppColors.secondaryColor),
-        ),
-        title: Text('Products', style: AppStyles.appBarTitle),
+        title: Text('Home Screen', style: AppStyles.appBarTitle),
         elevation: 3,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: CircleAvatar(
-              backgroundColor: Colors.white,
-              child: IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.add, color: AppColors.accentColor1),
-              ),
-            ),
-          ),
-        ],
       ),
-      body: Consumer<ProductProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.loadingcolor),
-            );
-          }
-          // Check if data has been loaded
-          if (provider.productModel == null) {
-            return const Center(child: Text("No data found."));
-          }
-          // Use the products list from the loaded model.
-          final List<Product> products = provider.productModel!.products;
-          return ListView.builder(
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return Container(
-                decoration: const BoxDecoration(
-                  color: AppColors.secondaryColor,
-                ),
-                child: Card(
-                  child: Container(
-                    height: 80,
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                      color: AppColors.secondaryColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 10),
-                        CircleAvatar(
-                            backgroundColor: AppColors.accentColor1,
-                            child: Image.network(product.images[0])),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                product.category.toString(),
-                                overflow: TextOverflow.ellipsis,
-                                style: AppStyles.bodyText,
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                "Discount: ${product.discountPercentage.toString()}%",
-                                overflow: TextOverflow.ellipsis,
-                                style: AppStyles.bodyText,
-                              ),
-                            ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              height: 560,
+              child: Consumer<ProductProvider>(
+                builder: (context, provider, child) {
+                  if (provider.isLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                          color: AppColors.loadingcolor),
+                    );
+                  }
+                  if (provider.productModel == null ||
+                      provider.productModel!.products.isEmpty) {
+                    return const Center(child: Text("No data found."));
+                  }
+
+                  final List<Product> products =
+                      provider.productModel!.products;
+
+                  return ListView.builder(
+                    itemCount: products.length,
+                    itemBuilder: (context, index) {
+                      final product = products[index];
+                      return ListTile(
+                        leading: Image.network(product.images[0],
+                            width: 80, height: 100, fit: BoxFit.cover),
+                        title: Text(product.title,
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text("Price: \$${product.price}"),
+                        trailing: CircleAvatar(
+                          backgroundColor: Colors.grey.shade200,
+                          child: IconButton(
+                            icon: Icon(Icons.edit, color: Colors.blue),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      EditProductScreen(product: product),
+                                ),
+                              );
+                            },
                           ),
                         ),
-                      ],
-                    ),
-                  ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 20),
+            //flas offer
+            Container(
+              height: 420,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color.fromARGB(255, 190, 192, 216),
+                    Color.fromARGB(255, 189, 193, 240),
+                  ],
                 ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
+              ),
+              child: Consumer<ProductProvider>(
+                builder: (context, provider, child) {
+                  if (provider.isLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                          color: AppColors.loadingcolor),
+                    );
+                  }
 
-  // SnackBar helper method.
-  void snackbar(context, {required String text, required Color color}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: color,
-        content: Row(
-          children: [
-            Expanded(child: Text('Successfully $text')),
-            const SizedBox(width: 20),
-            const Icon(Icons.done, color: AppColors.accentColor1),
+                  if (provider.productModel == null ||
+                      provider.productModel!.products.isEmpty) {
+                    return const Center(child: Text("No data found."));
+                  }
+
+                  final List<Product> products =
+                      provider.productModel!.products;
+
+                  return Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 15, right: 10, top: 10, bottom: 20),
+                        child: Row(
+                          children: [
+                            const CircleAvatar(
+                              backgroundColor: Colors.white,
+                              radius: 22,
+                              child: Icon(
+                                Icons.shopping_bag_rounded,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 5),
+                              child: Text(
+                                'Flash Sales',
+                                style: GoogleFonts.lora(
+                                  textStyle: const TextStyle(
+                                    fontSize: 22,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 330,
+                        child: ListView.builder(
+                          // Only show a maximum of 10 items.
+                          itemCount:
+                              products.length > 10 ? 10 : products.length,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            final product = products[index];
+
+                            return ProductTile(product: product);
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
