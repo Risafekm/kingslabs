@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:kingslabs/models/user_model.dart';
-import 'package:kingslabs/screens/login/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserproviderSignin extends ChangeNotifier {
@@ -25,7 +24,6 @@ class UserproviderSignin extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    // Correct endpoint for login
     final apiUrl = Uri.parse('https://dummyjson.com/auth/login');
     final userData = UserModel(
       username: email,
@@ -44,22 +42,18 @@ class UserproviderSignin extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        // Check if token exists in the response (indicating success)
         if (data['token'] != null) {
           _isAuthenticated = true;
           snackbar(context, text: 'Logged In');
 
-          // Save login state in SharedPreferences
           SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setBool('isLoggedIn', true);
         } else {
-          // If no token, treat as authentication failure
           _isAuthenticated = false;
           final error = data['message'] ?? 'Authentication failed';
           snackbar(context, text: error);
         }
       } else {
-        // For non-200 status codes, decode the error message if available
         final data = jsonDecode(response.body);
         final error = data['message'] ?? 'Failed to login';
         snackbar(context, text: error);

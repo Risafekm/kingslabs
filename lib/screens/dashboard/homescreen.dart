@@ -11,7 +11,7 @@ import '../../provider/productprovider.dart';
 import '../../core/colors.dart';
 import '../../core/style.dart';
 import '../description_page/product_detail_screen.dart';
-import '../login/login_screen.dart'; // Import your login screen
+import '../login/login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

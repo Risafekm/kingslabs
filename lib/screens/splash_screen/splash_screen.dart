@@ -30,7 +30,7 @@ class SplashScreen extends StatelessWidget {
     );
   }
 
-  // Checkng user is already logged in
+  // Checkng user is already logged in or not
   Future<void> _checkLoginStatus(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;

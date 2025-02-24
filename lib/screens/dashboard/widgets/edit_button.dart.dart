@@ -20,11 +20,11 @@ class EditProductScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Center(
-            child: Text(
+        centerTitle: true,
+        title: Text(
           "Edit Product",
           style: AppStyles.appBarTitle,
-        )),
+        ),
         backgroundColor: AppColors.accentColor1,
         leading: IconButton(
             onPressed: () {
