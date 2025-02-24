@@ -21,11 +21,23 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String username = "User";
+
   @override
   void initState() {
     super.initState();
+    _loadUsername();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<ProductProvider>(context, listen: false).getData();
+    });
+  }
+
+  Future<void> _loadUsername() async {
+    final prefs = await SharedPreferences.getInstance();
+    final loadedUsername = prefs.getString('username') ?? "User";
+    print("Loaded username: $loadedUsername");
+    setState(() {
+      username = loadedUsername;
     });
   }
 
@@ -43,11 +55,23 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
+        centerTitle: false,
         backgroundColor: AppColors.accentColor1,
-        title: Text('Home Screen', style: AppStyles.appBarTitle),
+        title: Padding(
+          padding: const EdgeInsets.only(left: 20),
+          child: Text('Home Screen', style: AppStyles.appBarTitle),
+        ),
         elevation: 3,
         actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Center(
+              child: Text(
+                username,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+          ),
           IconButton(
             onPressed: _logout,
             icon: Icon(

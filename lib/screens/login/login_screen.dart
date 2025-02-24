@@ -112,13 +112,13 @@ class LoginScreen extends StatelessWidget {
                     if (formKey.currentState!.validate()) {
                       SharedPreferences prefs =
                           await SharedPreferences.getInstance();
-                      await prefs.setBool(
-                          'isLoggedIn', true); // Save login status
+                      await prefs.setBool('isLoggedIn', true);
+                      await prefs.setString('username', nameController.text);
+                      print("Username saved: ${nameController.text}");
 
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomeScreen()),
+                        MaterialPageRoute(builder: (context) => HomeScreen()),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
